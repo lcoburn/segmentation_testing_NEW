@@ -1,4 +1,5 @@
 function runTracking
+clc
 %testTracking Test function for tracking an image sequence in time
 %dependent manner.
 
@@ -30,7 +31,7 @@ param=struct('o_filename',[pwd filesep 'fabulousTestData' filesep 'img_'],...
     'f_img_path',[],...
     'piv_path',[],...
     'bandpass_filter_path',[pwd filesep 'misc' filesep 'bandpass_filter_z-stack.ijm'],...
-    'imagej_path',[pwd filesep 'Fiji.app' filesep 'ImageJ-win64.exe']);
+    'imagej_path',[pwd filesep 'Fiji.app' filesep 'Contents/MacOS/ImageJ-macosx']);
 
 % Check if ImageJ is found. Terminate if not.
 if ~isempty(param.imagej_path)
@@ -45,6 +46,9 @@ output_path=[outputFolderName filesep];
 % Run tracking function.
 trackingWithVerticesAndGhost(param,output_path);
 % tracking(param,output_path)
+
+% save param
+load(['output' filesep 'testOutputTracking' filesep 'param.mat'],'param');
 
 % Remove misc functions from the Matlab path.
 rmpath([pwd filesep 'misc'])

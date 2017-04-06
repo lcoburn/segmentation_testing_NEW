@@ -23,7 +23,8 @@ clc;
 if(already_loaded == 0)
     %     tracklet_file_path='X:\mDrives\storage4\Guillermo\guillermo_functions\half_edge_correction\test_data_set_segmentation_parameters_vertices_1_200_';   %filename without '0_.mat'
     %     param = load_tracking_param_from_pieces(tracklet_file_path);
-    load 'Y:\mDrives\storage4\Guillermo\segmentation_testing\output\testOutputTracking\param.mat'
+    load(['output' filesep 'testOutputTracking' filesep 'param.mat']);
+    %load 'Y:\mDrives\storage4\Guillermo\segmentation_testing\output\testOutputTracking\param.mat'
 %     load param.mat
 end
 already_loaded = 1;
@@ -62,7 +63,7 @@ plotting = 1;
 %% REMOVE CELLS: find 1 cell, 2 cell and cells with weird number of neighbours
 % takes 226 s to go through all cells
 % takes 1297 s to go through all cells and correct errors (20 mins)
-if(1 == 1)
+if(1 == 0)
     % there 69 1 cells
     % there 19197 2 cells
     % no other cells
@@ -419,7 +420,7 @@ end
 
 %% GET CELLS: exclude cells outside bounds
 % this takes 1003 s (~20 mins)
-if(1 == 1)
+if(1 == 0)
     %     load('bounds1.mat');
     bounds = [0 0; 0 600; 600 600; 600 0]
     % these bounds have been created for F38_237
@@ -501,25 +502,28 @@ end
 if(1 == 1)
     load('cells_in_box_during_each_frame_1.mat') % , 'Cells', 'count_t'
     % this takes 4303 s
+    % create half edge
     if(1 == 1)
         half_edges = {};
         verts = {};
         NHE = zeros(1, Ns);
         HE_C = zeros(1, Ns);
-        C = zeros(Ntot + 1, Ns);
+        C = zeros(Ntot, Ns);
+        C_ghost = zeros(1, Ns);
         
-        for t = 1:Ns
+        for t = 1
             t
             cc = Cells(t, :);
             cc(cc == 0) = [];
             
             he_count = 0;
             c_count = 0;
-            HE = zeros(1000000, 8);
-            V  = zeros(1000000, 4);
-            
+            HE = zeros(10000, 8);
+            V  = zeros(10000, 4);
+
             % go thru cells and define half edges
             for id = cc
+                start_he = he_count + 1;
                 if(mod(c_count, 1000) == 0)
                     disp(['a: ', num2str(t), ' ', num2str(c_count/length(cc))])
                 end
@@ -561,10 +565,10 @@ if(1 == 1)
                         % perhaps put back into param1 here ??
                     end
                     
-                    % replace cell with ghost cell (Ntot + 1) if not in cc (not in box) (this takes a while)
+                    % replace cell with ghost cell (-1) if not in cc (not in box) (this takes a while)
                     for j = 1:length(neighs)
                         if(ismember(neighs(j), cc) == 0)
-                            neighs(j) = Ntot + 1;
+                            neighs(j) = -1;
                         end
                     end
                     
@@ -576,7 +580,9 @@ if(1 == 1)
                     he1  = he(ind1);
                     ind2 = mod(ind - 2, length(he)) + 1;
                     he2  = he(ind2);
-                    
+                    if(find(neighs == 0))
+                       disp('error');
+                    end
                     % half edge index
                     HE(he, 1) = he';
                     % cell index
@@ -594,11 +600,26 @@ if(1 == 1)
                     % fill in data into cells
                     C(id, t) = he(1);                       % put one half edge in
                     he_count = he_count + length(neighs);
+                    
+                    X1 = V(start_he:he_count, 1);
+                    Y1 = V(start_he:he_count, 2);
+                    X2 = V(start_he:he_count, 3);
+                    Y2 = V(start_he:he_count, 4);
+                    X1 = [X1; X1(1)];
+                    Y1 = [Y1; Y1(1)];
+                    X2 = [X2; X2(1)];
+                    Y2 = [Y2; Y2(1)];
+                    
+                    plot([X1 X2], [Y1 Y2], '-o', 'color', 'b'); hold on
+                   axis([0 601 0 601])
+                    
                 end
             end
             
+            
+            
             % define ghost cell
-            C(Ntot + 1, 2) = he_count + 1; % put one half edge in
+            C_ghost(t) = he_count + 1; % put one half edge in
             num_he = he_count;
             ghost_he = 0;
             
@@ -611,12 +632,12 @@ if(1 == 1)
                 c1 = HE(i, 2);
                 c2 = HE(i, 3);
                 
-                if(c2 == Ntot + 1)
+                if(c2 == -1)
                     % put he into ghost cell
                     ghost_he = ghost_he + 1;
                     he_count = he_count + 1;
                     HE(he_count, 1) = he_count;
-                    HE(he_count, 2) = Ntot + 1;
+                    HE(he_count, 2) = -1;
                     HE(he_count, 3) = c1;
                     HE(he_count, 4) = he_count + 1;
                     HE(he_count, 5) = he_count - 1;
@@ -670,7 +691,7 @@ if(1 == 1)
                                 b = [b(3:4), b(1:2)];
                                 c = abs(a - b);
                                 cont1 = 0;
-                                % disp('-')
+
                                 for ii = 0:length(ind1)
                                     ind1a = ind1(mod(ii:ii + length(ind1) - 1, length(ind1))  + 1);
                                     for jj = 1:length(ind2);
@@ -688,7 +709,7 @@ if(1 == 1)
                                         break;
                                     end
                                 end
-                                % disp('*')
+                                
                                 ind1a;
                                 ind2a;
                                 V(ind1', :) = V(ind1a',:);
@@ -757,7 +778,7 @@ if(1 == 1)
                                                 break;
                                             end
                                         end
-                                        % disp('*')
+                                        
                                         ind1a;
                                         ind2a;
                                         V(ind1', :) = V(ind1a',:);
@@ -791,7 +812,7 @@ if(1 == 1)
     end
     
     % remove any half edge without opposite
-    if(1 == 1)
+    if(1 == 0)
         for t = 1:Ns-1
             t
             % get half edge array on current and next time step
@@ -813,7 +834,7 @@ if(1 == 1)
     end
     
     % remove any half whose opposite is 0
-    if(1 == 1)
+    if(1 == 0)
         for t = 1:Ns-1
             t
             % get half edge array on current and next time step
@@ -831,7 +852,7 @@ if(1 == 1)
     end
     
     %% find vertex number and create vertex data
-    if(1 == 1)
+    if(1 == 0)
         VN = {};
         
         for t = 1:Ns
@@ -858,7 +879,7 @@ if(1 == 1)
                 edge = 0;
                 
                 % if not visited
-                if(visited(he) == 0) && (c1 ~= Ntot + 1) && (c2 ~= Ntot + 1)
+                if(visited(he) == 0) && (c1 ~= -1) && (c2 ~= -1)
                     
                     %% plot vertex and vertex bonds
                     counter = 1;
@@ -878,12 +899,12 @@ if(1 == 1)
                         he1 = HE(he1, 5);
                         c1 = HE(he1, 2);
                         c2 = HE(he1, 3);
-                        if(c1 == Ntot + 1) || (c2 == Ntot + 1)
+                        if(c1 == -1) || (c2 == -1)
                             edge = 1;
                         end
                     end
                     
-                    while(he1 ~= he) && (he1 ~= 0) && (c1 ~= Ntot + 1) && (c2 ~= Ntot + 1)
+                    while(he1 ~= he) && (he1 ~= 0) && (c1 ~= -1) && (c2 ~= -1)
                         counter = counter + 1;
                         vx = [vx, V(he1, 1)];
                         vy = [vy, V(he1, 2)];
@@ -896,14 +917,14 @@ if(1 == 1)
                             he1 = HE(he1, 5);
                             c1 = HE(he1, 2);
                             c2 = HE(he1, 3);
-                            if(c1 == Ntot + 1) || (c2 == Ntot + 1)
+                            if(c1 == -1) || (c2 == -1)
                                 edge = 1;
                             end
                         end
                     end
                     
                     % put vertex into vertices array
-                    if(c1 ~= Ntot + 1) && (edge == 0) && (length(e) <= 6)
+                    if(c1 ~= -1) && (edge == 0) && (length(e) <= 6)
                         % save number of vertices
                         v_count = v_count + 1;
                         Vertices(v_count, 1:length(e)) = e;
@@ -1000,7 +1021,7 @@ if(1 == 1)
                 if(heo == 0)
                     good_bond(he) = 0;
                 end
-                if(c1 == 0) || (c1 == Ntot + 1) || (c2 == 0) || (c2 == Ntot + 1)
+                if(c1 == 0) || (c1 == -1) || (c2 == 0) || (c2 == -1)
                     good_bond(he) = 0;
                 end
                 
@@ -1031,7 +1052,7 @@ if(1 == 1)
     end    
     
     %% connect frames: find next half edge index and previous index
-    if(1 == 1)
+    if(1 == 0)
         for t = 1:Ns - 1
             t
             %% get half edge array on current and next time step
@@ -1046,7 +1067,7 @@ if(1 == 1)
                 c1 = HE(i, 2);
                 c2 = HE(i, 3);
                 
-                if(c1 > 0) && (c2 ~= Ntot + 1)
+                if(c1 > 0) && (c2 ~= -1)
                     % get a half edge of c1 on next time step
                     he1 = C(c1, t1);
                     he1_start = he1;        % first value for he1
@@ -1097,7 +1118,7 @@ if(1 == 1)
     end
     
     % convert C, HE and V to uint16 and uint32
-    if(1 == 1)
+    if(1 == 0)
         half_edges1 = {};
         verts1 = {};
         for t = 1:Ns
@@ -1108,7 +1129,7 @@ if(1 == 1)
     end
     
     % save
-    if(1 == 1)
+    if(1 == 0)
         % this takes 60 s
         save(['half_edge_data_cells_9.mat'], 'C1', 'Cells', 'Ntot', 'Ns', '-v7.3');
         save(['half_edge_data_he_9.mat'],'half_edges1','NHE','HE_C','num_he','he_count','ghost_he','-v7.3');

@@ -10,13 +10,6 @@
 % viewer to create an iso-surface (one for each object), and to display it
 % in the 3D universe, with a random color.
 
-%% Make sure Java3D is installed
-% If not, try to install it
-
-if ~IsJava3DInstalled(true)
-    return
-end
-
 %%
 % Let us define the size of our target image volume. Not too big to save
 % memory.
@@ -85,9 +78,9 @@ for i = 1 : nballs
     %%
     % It is possible to specify the color of the iso-surface at creation,
     % but the 3D viewer expects a |Color3f| object, which is part of the
-    % |javax.vecmath package|. We determine its actual color randomly
-    % again.
-    color = javax.vecmath.Color3f(rand, rand, rand);
+    % |org.scijava.vecmath package|. We determine its actual color
+    % randomly again.
+    color = org.scijava.vecmath.Color3f(rand, rand, rand);
 
     %%
     % Finally, we add the object to the 3D universe, in the shape of an

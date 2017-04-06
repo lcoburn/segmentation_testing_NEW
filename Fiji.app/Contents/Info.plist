@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>ImageJ-tiger</string>
+	<string>ImageJ-macosx</string>
 	<key>CFBundleGetInfoString</key>
 	<string>Fiji for Mac OS X</string>
 	<key>CFBundleIconFile</key>
@@ -49,7 +49,7 @@
 	<key>fiji</key>
 	<dict>
 		<key>memory</key>
-		<string>auto</string>
+		<string>10000m</string>
 		<key>system</key>
 		<string>0</string>
 		<key>allowMultiple</key>

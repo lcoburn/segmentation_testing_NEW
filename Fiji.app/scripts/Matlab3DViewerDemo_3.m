@@ -10,14 +10,6 @@
 % we try to use the surface plot mode of the 3D viewer with a surface well
 % known to MATLAB users.
 
-
-%% Make sure Java3D is installed
-% If not, try to install it
-
-if ~IsJava3DInstalled(true)
-    return
-end
-
 %% Generate elevation data in MATLAB
 % This is the well known *membrane* dataset, that serves as a generator for
 % the MATLAB logo.
@@ -53,9 +45,9 @@ universe.show();
 %%
 % Feed it the previous ImagePlus, but render it as a surface plot, where
 % the intensity is encoded as height in a 3D space.
-color = javax.vecmath.Color3f(240 / 255, 120 / 255, 20 / 255);
+color = org.scijava.vecmath.Color3f(240 / 255, 120 / 255, 20 / 255);
 c = universe.addSurfacePlot(imp, ...
-        javax.vecmath.Color3f(), ...
+        org.scijava.vecmath.Color3f(), ...
         'Matlab Peak in 3D', ...
         1, ...
         [true true true], ...
@@ -69,7 +61,7 @@ c.setColor(color);
 c.setTransform([1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1]);
 universe.fireContentChanged(c);
 universe.centerSelected(c);
-universe.rotateUniverse(javax.vecmath.Vector3d(-1, -0.5, +0.2), +120 * pi / 180);
+universe.rotateUniverse(org.scijava.vecmath.Vector3d(-1, -0.5, +0.2), +120 * pi / 180);
 
 %%
 % Et voilà! A beautiful monochrome MATLAB logo, rendered in an accelerated

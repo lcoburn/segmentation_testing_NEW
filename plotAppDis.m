@@ -7,14 +7,14 @@ outPath = pwd;
 load('half_edge_data_cells_9.mat')
 load('half_edge_data_he_9.mat')
 load('half_edge_data_vert_9.mat')
-load 'Y:\mDrives\storage4\Guillermo\segmentation_testing\output\testOutputTracking\param.mat'
+load(['output' filesep 'testOutputTracking' filesep 'param.mat']);
 
 % imPath='Y:\mDrives\storage4\Guillermo\segmentation_testing\output\testOutputTracking\segments\img_';
 
-outPath = ['Y:\mDrives\storage4\Guillermo\segmentation_testing\output\testHalfEdge\img\'];
+outPath = ['output' filesep 'testHalfEdge' filesep 'img' filesep];
 mkdir(outPath)
 
-eR = expReader('X:\mDrives\storage4\Guillermo\segmentation_testing\fabulousTestData\');
+% eR = expReader('X:\mDrives\storage4\Guillermo\segmentation_testing\fabulousTestData\');
 for t=1:size(C1,2)-1
 
     HEa = half_edges1(t).HE;
@@ -48,13 +48,14 @@ for t=1:size(C1,2)-1
 % 	I = imread([imPath num2str(t,'%03d') '.tif']);
     fig=figure('Visible', 'off','units','normalized','outerposition',[0 0 1 1]); % overwriting the figure avoids filling the memory
 %     fig = figure(1);
-    imshow(eR.currentImage);
+%     imshow(eR.currentImage);
     hold on
     plot(xa',ya','-','lineWidth', 1, 'Color', 'c')
     plot(x1',y1','-','lineWidth', 1, 'Color', 'm')
     plot(x2',y2','-','lineWidth', 1, 'Color', 'y')
-    
-    eR.step
+    axis([0 601 0 601]);
+    axis equal
+%     eR.step
     frame = getframe(fig);
     imwrite(frame.cdata,[outPath filesep 'img_' num2str(t,'%04d') '.tif']);
 
@@ -68,4 +69,4 @@ disp(['Tracking finished results in: ' outPath])
 %         ' -vcodec msmpeg4 -vf scale=1920:-1 -q:v 8 ' outPath filesep...
 %         'edgeTrack_' num2str(hE2F) '_t0_' num2str(t0) '.avi']);
 
- load handel; sound(y,Fs) % program finished 
+%  load handel; sound(y,Fs) % program finished 

@@ -7,14 +7,15 @@ outPath = pwd;
 load('half_edge_data_cells_9.mat')
 load('half_edge_data_he_9.mat')
 load('half_edge_data_vert_9.mat')
-load 'Y:\mDrives\storage4\Guillermo\segmentation_testing\output\testOutputTracking\param.mat'
+load(['output' filesep 'testOutputTracking' filesep 'param.mat']);
 
 % imPath='Y:\mDrives\storage4\Guillermo\segmentation_testing\output\testOutputTracking\segments\img_';
 
-outPath = ['Y:\mDrives\storage4\Guillermo\segmentation_testing\output\testHalfEdge\img\'];
+outPath = ['output' filesep 'testHalfEdge' filesep 'img' filesep];
 mkdir(outPath)
 
-eR = expReader('X:\mDrives\storage4\Guillermo\segmentation_testing\fabulousTestData\');
+% eR = expReader(['fabulousTestData' filesep]);
+
 for t=1:size(C1,2)
 
     HEa = half_edges1(t).HE;
@@ -23,8 +24,8 @@ for t=1:size(C1,2)
     Va = verts1(t).V;
     Vb = verts1(t+1).V;
     
-    V1 = Va(HE(:,8) == 0,:); %disappearing edges
-    V2 = Vb(HE(:,7) == 0,:); %appearing edges
+    V1 = Va(HEa(:,8) == 0,:); %disappearing edges
+    V2 = Vb(HEb(:,7) == 0,:); %appearing edges
     
     xa = [Va(:,1) Va(:,3)];
     ya = [Va(:,2) Va(:,4)];
@@ -42,14 +43,14 @@ for t=1:size(C1,2)
 %     fig=figure('Visible', 'on'); % overwriting the figure avoids filling the memory
     fig = figure(1);
     subplot(1,2,1)
-    imshow(eR.currentImage);
+%     imshow(eR.currentImage);
     hold on
     plot(xa',ya',':','lineWidth', 1, 'Color', 'c')
     plot(x1',y1',':','lineWidth', 1, 'Color', 'm')
     
     subplot(1,2,2)
     eR.step
-    imshow(eR.currentImage);
+%     imshow(eR.currentImage);
     hold on
     plot(xb',yb',':','lineWidth', 1, 'Color', 'c')
     plot(x2',y2',':','lineWidth', 1, 'Color', 'm')
@@ -63,8 +64,8 @@ end
 disp(['Tracking finished results in: ' outPath])
 
 % generate the movie. ffmpeg must be added to the path
-system(['ffmpeg -r 10 -i ' outPath filesep 'img_%04d.tif'...
-        ' -vcodec msmpeg4 -vf scale=1920:-1 -q:v 8 ' outPath filesep...
-        'edgeTrack_' num2str(hE2F) '_t0_' num2str(t0) '.avi']);
-
- load handel; sound(y,Fs) % program finished 
+% system(['ffmpeg -r 10 -i ' outPath filesep 'img_%04d.tif'...
+%         ' -vcodec msmpeg4 -vf scale=1920:-1 -q:v 8 ' outPath filesep...
+%         'edgeTrack_' num2str(hE2F) '_t0_' num2str(t0) '.avi']);
+% 
+%  load handel; sound(y,Fs) % program finished 
